@@ -2,17 +2,28 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,jsx}",
   ],
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
+        navy: {
+          900: '#0B1941',
+          800: '#0F2356',
+          700: '#163375',
+          600: '#1E429F',
+        },
+        brand: {
+          orange: '#FA541C',
+          hover: '#E04816',
+          light: '#FFF2E8',
+          subtle: '#FFF7E6',
+        },
+        surface: {
+          canvas: '#F4F5F7',
+          card: '#FFFFFF',
+          border: '#E5E7EB',
+          muted: '#F9FAFB',
         }
       }
     },
