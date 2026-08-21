@@ -1,21 +1,42 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 import { Package, Wrench, ArrowLeftRight, ShoppingCart } from 'lucide-react';
 
 export default function Sidebar() {
-  const navItems = [
-    { to: '/inventory', label: 'Inventory', icon: Package, badge: 'Stock' },
-    { to: '/work-orders', label: 'Work Orders', icon: Wrench, badge: 'Prod' },
-    { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, badge: 'Move' },
-    { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart, badge: 'Sales' },
+  const { user } = useAuth();
+
+  const allNavItems = [
+    { to: '/inventory', label: 'Inventory', icon: Package, badge: 'Stock', roles: ['ADMIN', 'OPERATIONS_USER', 'SALES_USER'] },
+    { to: '/work-orders', label: 'Work Orders', icon: Wrench, badge: 'Prod', roles: ['ADMIN', 'OPERATIONS_USER'] },
+    { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, badge: 'Move', roles: ['ADMIN', 'OPERATIONS_USER'] },
+    { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart, badge: 'Sales', roles: ['ADMIN', 'SALES_USER'] },
   ];
+
+  // Dynamically filter navigation links based on user's authorized role
+  const navItems = user
+    ? allNavItems.filter((item) => item.roles.includes(user.role))
+    : allNavItems;
+
+  const getRoleHeaderLabel = (role) => {
+    switch (role) {
+      case 'ADMIN':
+        return 'Admin Portal';
+      case 'OPERATIONS_USER':
+        return 'Operations Portal';
+      case 'SALES_USER':
+        return 'Sales Portal';
+      default:
+        return 'Operations';
+    }
+  };
 
   return (
     <aside className="w-16 sm:w-56 bg-white border-r border-gray-200 flex flex-col justify-between shrink-0 select-none shadow-xs">
       <div className="py-4">
         <div className="px-4 mb-2.5 hidden sm:flex items-center justify-between">
           <span className="text-[10px] font-bold tracking-wider text-gray-400 uppercase">
-            Operations
+            {getRoleHeaderLabel(user?.role)}
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
         </div>

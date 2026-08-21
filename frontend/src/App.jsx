@@ -7,6 +7,14 @@ import WorkOrdersScreen from './pages/WorkOrdersScreen.jsx';
 import TransfersScreen from './pages/TransfersScreen.jsx';
 import CustomerOrdersScreen from './pages/CustomerOrdersScreen.jsx';
 
+function RoleProtectedRoute({ allowedRoles, children }) {
+  const { user, hasRole } = useAuth();
+  if (user && !hasRole(allowedRoles)) {
+    return <Navigate to="/inventory" replace />;
+  }
+  return children;
+}
+
 function AppContent() {
   const { loading } = useAuth();
 
@@ -24,9 +32,37 @@ function AppContent() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/inventory" replace />} />
         <Route path="inventory" element={<InventoryScreen />} />
-        <Route path="work-orders" element={<WorkOrdersScreen />} />
-        <Route path="transfers" element={<TransfersScreen />} />
-        <Route path="customer-orders" element={<CustomerOrdersScreen />} />
+        
+        {/* Work Orders restricted to ADMIN and OPERATIONS_USER */}
+        <Route
+          path="work-orders"
+          element={
+            <RoleProtectedRoute allowedRoles={['ADMIN', 'OPERATIONS_USER']}>
+              <WorkOrdersScreen />
+            </RoleProtectedRoute>
+          }
+        />
+        
+        {/* Transfers restricted to ADMIN and OPERATIONS_USER */}
+        <Route
+          path="transfers"
+          element={
+            <RoleProtectedRoute allowedRoles={['ADMIN', 'OPERATIONS_USER']}>
+              <TransfersScreen />
+            </RoleProtectedRoute>
+          }
+        />
+        
+        {/* Customer Orders restricted to ADMIN and SALES_USER */}
+        <Route
+          path="customer-orders"
+          element={
+            <RoleProtectedRoute allowedRoles={['ADMIN', 'SALES_USER']}>
+              <CustomerOrdersScreen />
+            </RoleProtectedRoute>
+          }
+        />
+
         <Route path="login" element={<Navigate to="/inventory" replace />} />
       </Route>
 
