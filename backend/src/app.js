@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { env } from './config/env.js';
+import apiRoutes from './routes/index.js';
 
 const app = express();
 
@@ -22,12 +23,21 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+// Mount modular API routes
+app.use('/api', apiRoutes);
+
 // Centralized error handling middleware
 app.use((err, _req, res, _next) => {
-  console.error('Unhandled Server Error:', err);
-  res.status(err.status || 500).json({
+  const status = err.status || 500;
+  const message = err.message || 'Internal Server Error';
+  
+  if (status >= 500) {
+    console.error('Server Internal Error:', err);
+  }
+
+  res.status(status).json({
     success: false,
-    message: err.message || 'Internal Server Error'
+    message
   });
 });
 
