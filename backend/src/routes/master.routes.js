@@ -3,7 +3,7 @@ import { locationController, itemController, userController } from '../controlle
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { authorize } from '../middlewares/rbac.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
-import { createLocationSchema, createItemSchema } from '../validators/master.validator.js';
+import { createLocationSchema, createItemSchema, createUserSchema, updateUserSchema } from '../validators/master.validator.js';
 
 const router = Router();
 
@@ -28,7 +28,24 @@ router.post(
   (req, res, next) => itemController.createItem(req, res, next)
 );
 
-// Users (for assigning work orders)
+// Users / Employee Management
 router.get('/users', (req, res, next) => userController.getAllUsers(req, res, next));
+router.post(
+  '/users',
+  authorize(['ADMIN']),
+  validate(createUserSchema),
+  (req, res, next) => userController.createUser(req, res, next)
+);
+router.put(
+  '/users/:id',
+  authorize(['ADMIN']),
+  validate(updateUserSchema),
+  (req, res, next) => userController.updateUser(req, res, next)
+);
+router.delete(
+  '/users/:id',
+  authorize(['ADMIN']),
+  (req, res, next) => userController.deleteUser(req, res, next)
+);
 
 export default router;

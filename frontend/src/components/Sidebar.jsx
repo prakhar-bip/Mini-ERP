@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Package, Wrench, ArrowLeftRight, ShoppingCart } from 'lucide-react';
+import { Package, Wrench, ArrowLeftRight, ShoppingCart, Users } from 'lucide-react';
 
 export default function Sidebar() {
   const { user } = useAuth();
@@ -11,6 +11,7 @@ export default function Sidebar() {
     { to: '/work-orders', label: 'Work Orders', icon: Wrench, roles: ['ADMIN', 'OPERATIONS_USER'] },
     { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, roles: ['ADMIN', 'OPERATIONS_USER'] },
     { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart, roles: ['ADMIN', 'SALES_USER'] },
+    { to: '/users', label: 'Employees', icon: Users, roles: ['ADMIN'] },
   ];
 
   // Dynamically filter navigation links based on user's authorized role

@@ -6,6 +6,7 @@ import InventoryScreen from './pages/InventoryScreen.jsx';
 import WorkOrdersScreen from './pages/WorkOrdersScreen.jsx';
 import TransfersScreen from './pages/TransfersScreen.jsx';
 import CustomerOrdersScreen from './pages/CustomerOrdersScreen.jsx';
+import UsersScreen from './pages/UsersScreen.jsx';
 
 function RoleProtectedRoute({ allowedRoles, children }) {
   const { user, hasRole } = useAuth();
@@ -59,6 +60,16 @@ function AppContent() {
           element={
             <RoleProtectedRoute allowedRoles={['ADMIN', 'SALES_USER']}>
               <CustomerOrdersScreen />
+            </RoleProtectedRoute>
+          }
+        />
+
+        {/* Employee Management restricted to ADMIN */}
+        <Route
+          path="users"
+          element={
+            <RoleProtectedRoute allowedRoles={['ADMIN']}>
+              <UsersScreen />
             </RoleProtectedRoute>
           }
         />

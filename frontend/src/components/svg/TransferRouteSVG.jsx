@@ -108,7 +108,7 @@ export default function TransferRouteSVG({
             </>
           )}
         </div>
-        <span className="text-[9px] text-gray-400 font-mono mt-0.5">ACID Double-Entry</span>
+        <span className="text-[9px] text-gray-400 font-mono mt-0.5">Stock Movement</span>
       </div>
 
       {/* Destination Warehouse Node */}

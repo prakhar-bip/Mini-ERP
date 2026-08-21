@@ -33,7 +33,10 @@ export const authAPI = {
 export const masterAPI = {
   getLocations: () => api.get('/master/locations'),
   getItems: () => api.get('/master/items'),
-  getUsers: () => api.get('/master/users')
+  getUsers: () => api.get('/master/users'),
+  createUser: (data) => api.post('/master/users', data),
+  updateUser: (id, data) => api.put(`/master/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/master/users/${id}`)
 };
 
 export const inventoryAPI = {

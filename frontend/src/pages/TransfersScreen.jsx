@@ -531,13 +531,6 @@ export default function TransfersScreen() {
             />
           </div>
 
-          <div className="p-3.5 bg-amber-50/80 rounded-xl border border-amber-200 text-[11px] text-amber-900 flex items-start gap-2">
-            <Truck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <strong>ACID Rule:</strong> Source stock reduces upon <em>Dispatch</em>. Destination stock will <em>NOT</em> increase until <em>Received</em>.
-            </div>
-          </div>
-
           <div className="flex items-center justify-end space-x-2 pt-4 border-t border-surface-border">
             <button
               type="button"

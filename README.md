@@ -27,11 +27,24 @@ $$\text{Inventory} \longrightarrow \text{Work Order} \longrightarrow \text{Stock
 
 1. **Inventory**: Track stock across warehouses and batches with formula:
    $$\text{Available Quantity} = \text{Physical Quantity} - \text{Reserved Quantity}$$
-2. **Work Order**: Production orders scheduled by Admin at target warehouse locations.
+2. **Work Order**: Production orders scheduled by Admin at target warehouse locations and assigned to Operations Users (`assignedUserId`).
 3. **Stock Check**: Automatic shortage detection:
    $$\text{Shortage} = \max(0, \text{Required Quantity} - \text{Available Stock at Location})$$
 4. **Internal Transfer**: Inter-warehouse stock replenishment. Source decreases on dispatch; destination increases **only** on receipt.
 5. **Customer Reservation**: Sales order booking with PostgreSQL row-level locks (`SELECT ... FOR UPDATE`) inside ACID transactions to strictly prevent overselling.
+
+---
+
+## 👑 Admin End-to-End Supervisory Workflow
+
+The **Admin** role acts as the central orchestrator, managing both **Operations** and **Sales** workflows:
+
+- **Operations Oversight**:
+  - Creates and assigns Work Orders to Operations Users (`assignedUserId`).
+  - Monitors live inventory shortages and triggers or approves Inter-Warehouse Stock Transfers.
+- **Sales Oversight**:
+  - Oversees customer order placements, active stock reservations, and concurrency allocation limits.
+  - Can cancel customer orders to release reserved inventory back to available stock.
 
 ---
 

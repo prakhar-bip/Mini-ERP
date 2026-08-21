@@ -128,7 +128,7 @@ export default function AuthModal() {
               onClick={() => handleQuickDemo('ADMIN')}
               className="p-2 rounded-xl border border-gray-200 bg-gray-50/60 hover:bg-gray-100 text-gray-800 text-xs font-semibold interactive-btn text-center cursor-pointer transition"
             >
-              👑 Admin
+              Admin
               <span className="block text-[9px] text-gray-500 font-normal">Full Control</span>
             </button>
             <button
@@ -136,7 +136,7 @@ export default function AuthModal() {
               onClick={() => handleQuickDemo('OPERATIONS_USER')}
               className="p-2 rounded-xl border border-gray-200 bg-gray-50/60 hover:bg-gray-100 text-gray-800 text-xs font-semibold interactive-btn text-center cursor-pointer transition"
             >
-              ⚙️ Operations
+              Operations
               <span className="block text-[9px] text-gray-500 font-normal">Stock & Transfers</span>
             </button>
             <button
@@ -144,7 +144,7 @@ export default function AuthModal() {
               onClick={() => handleQuickDemo('SALES_USER')}
               className="p-2 rounded-xl border border-gray-200 bg-gray-50/60 hover:bg-gray-100 text-gray-800 text-xs font-semibold interactive-btn text-center cursor-pointer transition"
             >
-              🛒 Sales
+              Sales
               <span className="block text-[9px] text-gray-500 font-normal">Orders & Locks</span>
             </button>
           </div>

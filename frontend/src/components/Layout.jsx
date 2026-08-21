@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import Header from './Header.jsx';
 import Sidebar from './Sidebar.jsx';
 import AuthModal from './AuthModal.jsx';
-import { ChevronRight, Database, Package, Wrench, ArrowLeftRight, ShoppingCart, Sparkles } from 'lucide-react';
+import { ChevronRight, Database, Package, Wrench, ArrowLeftRight, ShoppingCart, Sparkles, Users } from 'lucide-react';
 
 export default function Layout() {
   const { user } = useAuth();
@@ -13,13 +13,15 @@ export default function Layout() {
   const getBreadcrumbInfo = (path) => {
     switch (path) {
       case '/inventory':
-        return { label: 'Inventory & Stock Management', icon: Package, badge: 'Realtime Stock' };
+        return { label: 'Inventory & Stock Management', icon: Package, badge: 'Stock' };
       case '/work-orders':
-        return { label: 'Production & Work Orders', icon: Wrench, badge: 'Material Shortage Engine' };
+        return { label: 'Production & Work Orders', icon: Wrench, badge: 'Work Orders' };
       case '/transfers':
-        return { label: 'Internal Stock Transfers', icon: ArrowLeftRight, badge: 'ACID Double-Entry' };
+        return { label: 'Internal Stock Transfers', icon: ArrowLeftRight, badge: 'Transfers' };
       case '/customer-orders':
-        return { label: 'Customer Orders & Reservation', icon: ShoppingCart, badge: 'Row-Lock Protected' };
+        return { label: 'Customer Orders & Reservation', icon: ShoppingCart, badge: 'Sales Orders' };
+      case '/users':
+        return { label: 'Employee & Staff Management', icon: Users, badge: 'Employees' };
       default:
         return { label: 'Operations Dashboard', icon: Sparkles, badge: 'Active' };
     }

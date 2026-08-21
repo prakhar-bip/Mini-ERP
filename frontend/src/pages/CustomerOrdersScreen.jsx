@@ -434,14 +434,6 @@ export default function CustomerOrdersScreen() {
             />
           </div>
 
-          {/* Concurrency guard informative banner with ConcurrencyShieldSVG */}
-          <div className="p-3.5 bg-blue-50/80 rounded-xl border border-blue-200 text-[11px] text-blue-900 flex items-start gap-2.5">
-            <ConcurrencyShieldSVG className="w-5 h-5 shrink-0 mt-0.5" animated={true} />
-            <div>
-              <strong>ACID Concurrency Protection:</strong> Reservation is executed with PostgreSQL row-level locking (<code>SELECT FOR UPDATE</code>) to prevent race conditions & overselling.
-            </div>
-          </div>
-
           <div className="flex items-center justify-end space-x-2 pt-4 border-t border-surface-border">
             <button
               type="button"

@@ -51,6 +51,33 @@ export class UserController {
       next(err);
     }
   }
+
+  async createUser(req, res, next) {
+    try {
+      const user = await userService.createUser(req.body);
+      res.status(201).json({ success: true, message: 'Employee added successfully', data: user });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateUser(req, res, next) {
+    try {
+      const user = await userService.updateUser(req.params.id, req.body);
+      res.status(200).json({ success: true, message: 'Employee updated successfully', data: user });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteUser(req, res, next) {
+    try {
+      const result = await userService.deleteUser(req.params.id, req.user.id);
+      res.status(200).json({ success: true, message: result.message });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const locationController = new LocationController();
