@@ -2,58 +2,46 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import Layout from './components/Layout.jsx';
-import LoginScreen from './pages/LoginScreen.jsx';
 import InventoryScreen from './pages/InventoryScreen.jsx';
 import WorkOrdersScreen from './pages/WorkOrdersScreen.jsx';
 import TransfersScreen from './pages/TransfersScreen.jsx';
 import CustomerOrdersScreen from './pages/CustomerOrdersScreen.jsx';
 
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+function AppContent() {
+  const { loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-navy-900 flex items-center justify-center text-white text-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading Mini ERP Session...</span>
-        </div>
+      <div className="min-h-screen bg-navy-950 flex flex-col items-center justify-center text-white text-xs gap-3 animate-fadeIn">
+        <div className="w-6 h-6 border-2 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
+        <span className="font-medium text-gray-400">Loading Enterprise Session...</span>
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Navigate to="/inventory" replace />} />
+        <Route path="inventory" element={<InventoryScreen />} />
+        <Route path="work-orders" element={<WorkOrdersScreen />} />
+        <Route path="transfers" element={<TransfersScreen />} />
+        <Route path="customer-orders" element={<CustomerOrdersScreen />} />
+        <Route path="login" element={<Navigate to="/inventory" replace />} />
+      </Route>
 
-  return children;
+      <Route path="*" element={<Navigate to="/inventory" replace />} />
+    </Routes>
+  );
 }
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginScreen />} />
-
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="/inventory" replace />} />
-            <Route path="inventory" element={<InventoryScreen />} />
-            <Route path="work-orders" element={<WorkOrdersScreen />} />
-            <Route path="transfers" element={<TransfersScreen />} />
-            <Route path="customer-orders" element={<CustomerOrdersScreen />} />
-          </Route>
-
-          <Route path="*" element={<Navigate to="/inventory" replace />} />
-        </Routes>
+        <AppContent />
       </BrowserRouter>
     </AuthProvider>
   );
 }
+

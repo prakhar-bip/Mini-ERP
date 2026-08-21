@@ -1,7 +1,17 @@
 import express from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { env } from './config/env.js';
 import apiRoutes from './routes/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const swaggerDocument = JSON.parse(
+  readFileSync(join(__dirname, 'docs', 'swagger.json'), 'utf-8')
+);
 
 const app = express();
 
@@ -22,6 +32,9 @@ app.get('/api/health', (_req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Swagger API Documentation endpoint
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Mount modular API routes
 app.use('/api', apiRoutes);

@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { customerOrderAPI, masterAPI, inventoryAPI } from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { ShoppingCart, Plus, CheckCircle2, AlertCircle, RefreshCw, XCircle, ShieldCheck, Lock } from 'lucide-react';
+import { ShoppingCart, Plus, CheckCircle2, AlertCircle, RefreshCw, XCircle, ShieldCheck, Lock, DollarSign, Box } from 'lucide-react';
+import Modal from '../components/common/Modal.jsx';
+import Toast from '../components/common/Toast.jsx';
+import SkeletonLoader from '../components/common/SkeletonLoader.jsx';
+import EmptyStateSVG from '../components/svg/EmptyStateSVG.jsx';
+import ConcurrencyShieldSVG from '../components/svg/ConcurrencyShieldSVG.jsx';
 
 export default function CustomerOrdersScreen() {
-  const { hasRole } = useAuth();
+  const { user, hasRole } = useAuth();
   const [orders, setOrders] = useState([]);
   const [locations, setLocations] = useState([]);
   const [items, setItems] = useState([]);
@@ -23,6 +28,39 @@ export default function CustomerOrdersScreen() {
   });
 
   const fetchData = async () => {
+    if (!user) {
+      setOrders([
+        {
+          id: 'preview-ord-1',
+          orderNumber: 'SO-2026-501',
+          customerName: 'Tata Power EV Solutions',
+          status: 'CONFIRMED',
+          quantity: 15,
+          createdAt: new Date().toISOString(),
+          location: { name: 'Main Fulfillment Center', code: 'WH-MAIN' },
+          item: { name: 'Commercial Energy Storage Pack', sku: 'FG-ESS-100KW', unit: 'units' }
+        },
+        {
+          id: 'preview-ord-2',
+          orderNumber: 'SO-2026-502',
+          customerName: 'Bharat Heavy Electricals Ltd',
+          status: 'CONFIRMED',
+          quantity: 25,
+          createdAt: new Date().toISOString(),
+          location: { name: 'Western Hub', code: 'WH-WEST' },
+          item: { name: 'Industrial Battery Module', sku: 'FG-BAT-48V', unit: 'units' }
+        }
+      ]);
+      setLocations([
+        { id: 'loc-1', name: 'Main Fulfillment Center', code: 'WH-MAIN' }
+      ]);
+      setItems([
+        { id: 'item-1', name: 'Commercial Energy Storage Pack', sku: 'FG-ESS-100KW' }
+      ]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [orderRes, locRes, itemRes, invRes] = await Promise.all([
@@ -51,7 +89,7 @@ export default function CustomerOrdersScreen() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [user]);
 
   const showNotification = (type, message) => {
     setNotification({ type, message });
@@ -120,32 +158,80 @@ export default function CustomerOrdersScreen() {
   };
 
   const availableStock = getAvailableStockForSelected();
+  const confirmedCount = orders.filter(o => o.status === 'CONFIRMED').length;
+  const cancelledCount = orders.filter(o => o.status === 'CANCELLED').length;
+  const totalReservedUnits = orders
+    .filter(o => o.status === 'CONFIRMED')
+    .reduce((sum, o) => sum + o.quantity, 0);
 
   return (
     <div className="space-y-6">
       {/* Toast Notification */}
-      {notification && (
-        <div
-          className={`p-3 rounded-lg text-xs flex items-center gap-2 shadow-md transition-all ${
-            notification.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-        >
-          {notification.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          ) : (
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-          )}
-          <span className="font-medium">{notification.message}</span>
+      <Toast notification={notification} onClose={() => setNotification(null)} />
+
+      {/* KPI Overview Strip with ACID Concurrency Shield */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Orders</span>
+            <div className="text-2xl font-black text-gray-900 mt-1">{orders.length}</div>
+            <span className="text-[10px] text-gray-500 font-medium mt-1 block">Sales Orders Logged</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-brand-orange shadow-xs">
+            <ShoppingCart className="w-5 h-5" />
+          </div>
         </div>
-      )}
+
+        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Confirmed & Locked</span>
+            <div className="text-2xl font-black text-emerald-700 mt-1">{confirmedCount}</div>
+            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
+              <CheckCircle2 className="w-3 h-3" /> Active Fulfillments
+            </span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Reserved Units</span>
+            <div className="text-2xl font-black text-brand-orange mt-1">{totalReservedUnits.toLocaleString()}</div>
+            <span className="text-[10px] text-brand-orange font-semibold flex items-center gap-1 mt-1">
+              <Box className="w-3 h-3" /> Protected in Buckets
+            </span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-brand-orange shadow-xs">
+            <Lock className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Concurrency Engine</span>
+            <div className="text-xs font-black text-blue-900 mt-1 flex items-center gap-1.5">
+              <span>PostgreSQL Lock</span>
+              <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 text-[9px] font-mono">Row-Level</span>
+            </div>
+            <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
+              <CheckCircle2 className="w-3 h-3" /> 0% Oversell Guarantee
+            </span>
+          </div>
+          <div className="p-1 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shadow-xs">
+            <ConcurrencyShieldSVG className="w-8 h-8" animated={true} />
+          </div>
+        </div>
+      </div>
 
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-surface-card p-5 rounded-xl border border-surface-border shadow-xs gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-surface-card p-5 rounded-2xl border border-surface-border shadow-xs gap-4">
         <div>
           <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-brand-orange" />
+            <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
+              <ShoppingCart className="w-4 h-4" />
+            </div>
             Customer Orders & Stock Reservation
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -157,21 +243,21 @@ export default function CustomerOrdersScreen() {
           <button
             onClick={fetchData}
             title="Refresh"
-            className="p-2 text-gray-500 hover:text-gray-900 border border-surface-border rounded-lg bg-surface-muted hover:bg-gray-100 transition cursor-pointer"
+            className="p-2 text-gray-500 hover:text-gray-900 border border-surface-border rounded-xl bg-surface-muted hover:bg-gray-100 transition interactive-btn cursor-pointer"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-brand-orange' : ''}`} />
           </button>
 
           {hasRole(['ADMIN', 'SALES_USER']) ? (
             <button
               onClick={() => setShowModal(true)}
-              className="bg-brand-orange hover:bg-brand-hover text-white px-4 py-2 rounded-lg font-medium text-xs shadow-md shadow-orange-500/20 flex items-center gap-1.5 transition cursor-pointer"
+              className="bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-orange-500/20 flex items-center gap-1.5 interactive-btn cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               New Customer Order
             </button>
           ) : (
-            <div className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+            <div className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 font-medium">
               * Sales role only
             </div>
           )}
@@ -179,204 +265,201 @@ export default function CustomerOrdersScreen() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-surface-card rounded-xl border border-surface-border p-5 shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-surface-border text-gray-500 bg-surface-muted/50 font-semibold">
-                <th className="py-3 px-3">Order Number</th>
-                <th className="py-3 px-3">Customer Name</th>
-                <th className="py-3 px-3">Fulfillment Location</th>
-                <th className="py-3 px-3">Item Ordered</th>
-                <th className="py-3 px-3 text-center">Reserved Quantity</th>
-                <th className="py-3 px-3 text-center">Status</th>
-                <th className="py-3 px-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-surface-border">
-              {orders.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="py-8 text-center text-gray-400 text-xs">
-                    No customer orders found. Click "+ New Customer Order" to create one.
-                  </td>
+      <div className="bg-surface-card rounded-2xl border border-surface-border p-5 shadow-xs">
+        <div className="overflow-x-auto min-h-[260px]">
+          {loading ? (
+            <SkeletonLoader rows={5} cols={7} />
+          ) : (
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-surface-border text-gray-500 bg-surface-muted/50 font-semibold">
+                  <th className="py-3 px-3">Order Number</th>
+                  <th className="py-3 px-3">Customer Name</th>
+                  <th className="py-3 px-3">Fulfillment Location</th>
+                  <th className="py-3 px-3">Item Ordered</th>
+                  <th className="py-3 px-3 text-center">Reserved Quantity</th>
+                  <th className="py-3 px-3 text-center">Status</th>
+                  <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
-              ) : (
-                orders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-gray-50/80 transition">
-                    <td className="py-3 px-3 font-mono font-bold text-gray-900">
-                      {ord.orderNumber}
-                      <div className="text-[10px] font-normal text-gray-400">
-                        {new Date(ord.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 font-semibold text-gray-800">
-                      {ord.customerName}
-                    </td>
-                    <td className="py-3 px-3 text-gray-700">
-                      <span className="font-medium">{ord.location.name}</span>
-                      <span className="text-[10px] text-gray-400 font-mono ml-1">({ord.location.code})</span>
-                    </td>
-                    <td className="py-3 px-3">
-                      <div className="font-semibold text-gray-900">{ord.item.name}</div>
-                      <div className="text-[10px] text-gray-500 font-mono">{ord.item.sku}</div>
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200 font-bold text-xs">
-                        {ord.quantity} {ord.item.unit}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      {ord.status === 'CONFIRMED' ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-[11px] inline-flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-emerald-600" /> Confirmed
-                        </span>
-                      ) : (
-                        <span className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200 font-semibold text-[11px]">
-                          Cancelled
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-3 text-right">
-                      {ord.status === 'CONFIRMED' && hasRole(['ADMIN', 'SALES_USER']) && (
-                        <button
-                          onClick={() => handleCancelOrder(ord.id)}
-                          disabled={actionLoading}
-                          className="px-2.5 py-1 text-red-600 hover:bg-red-50 border border-red-200 rounded text-[11px] font-medium transition inline-flex items-center gap-1 cursor-pointer"
-                        >
-                          <XCircle className="w-3 h-3" /> Cancel & Release
-                        </button>
-                      )}
-                      {ord.status === 'CANCELLED' && (
-                        <span className="text-[11px] text-gray-400 font-medium">Released</span>
-                      )}
+              </thead>
+              <tbody className="divide-y divide-surface-border">
+                {orders.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-6">
+                      <EmptyStateSVG
+                        title="No Customer Orders Found"
+                        subtitle="Create a new customer order to reserve stock with concurrency protection."
+                        actionText={hasRole(['ADMIN', 'SALES_USER']) ? "+ New Customer Order" : null}
+                        onAction={() => setShowModal(true)}
+                      />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  orders.map((ord) => (
+                    <tr key={ord.id} className="hover:bg-orange-50/30 transition-colors duration-150 group">
+                      <td className="py-3 px-3 font-mono font-bold text-gray-900">
+                        <span className="group-hover:text-brand-orange transition-colors">{ord.orderNumber}</span>
+                        <div className="text-[10px] font-normal text-gray-400">
+                          {new Date(ord.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 font-bold text-gray-900">
+                        {ord.customerName}
+                      </td>
+                      <td className="py-3 px-3 text-gray-700">
+                        <span className="font-semibold">{ord.location.name}</span>
+                        <span className="text-[10px] text-gray-400 font-mono ml-1">({ord.location.code})</span>
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="font-bold text-gray-900">{ord.item.name}</div>
+                        <div className="text-[10px] text-gray-500 font-mono">{ord.item.sku}</div>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200 font-black text-xs">
+                          {ord.quantity} {ord.item.unit}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        {ord.status === 'CONFIRMED' ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[11px] inline-flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Confirmed
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 font-medium text-[11px]">
+                            Cancelled
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        {ord.status === 'CONFIRMED' && hasRole(['ADMIN', 'SALES_USER']) && (
+                          <button
+                            onClick={() => handleCancelOrder(ord.id)}
+                            disabled={actionLoading}
+                            className="px-2.5 py-1 text-red-600 hover:bg-red-50 border border-red-200 rounded-lg text-[11px] font-bold transition interactive-btn inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <XCircle className="w-3 h-3" /> Cancel & Release
+                          </button>
+                        )}
+                        {ord.status === 'CANCELLED' && (
+                          <span className="text-[11px] text-gray-400 font-medium">Released</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
       {/* Create Order Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-surface-border">
-            <div className="flex items-center justify-between pb-3 border-b border-surface-border mb-4">
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-brand-orange" />
-                Create Order & Reserve Stock
-              </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-lg cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateOrder} className="space-y-3.5">
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-700 mb-1">
-                  Order Number (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. SO-1002 (Auto-generated if empty)"
-                  value={formData.orderNumber}
-                  onChange={(e) => setFormData({ ...formData, orderNumber: e.target.value })}
-                  className="w-full text-xs border border-surface-border rounded-lg p-2 bg-surface-muted focus:bg-white focus:border-brand-orange focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Customer Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Bharat Heavy Electricals"
-                  value={formData.customerName}
-                  onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                  className="w-full text-xs border border-surface-border rounded-lg p-2 bg-surface-muted focus:bg-white focus:border-brand-orange focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Fulfillment Location</label>
-                <select
-                  value={formData.locationId}
-                  onChange={(e) => setFormData({ ...formData, locationId: e.target.value })}
-                  className="w-full text-xs border border-surface-border rounded-lg p-2 bg-surface-muted focus:bg-white focus:border-brand-orange focus:outline-none"
-                >
-                  {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>
-                      {loc.name} ({loc.code})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Item to Order</label>
-                <select
-                  value={formData.itemId}
-                  onChange={(e) => setFormData({ ...formData, itemId: e.target.value })}
-                  className="w-full text-xs border border-surface-border rounded-lg p-2 bg-surface-muted focus:bg-white focus:border-brand-orange focus:outline-none"
-                >
-                  {items.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name} ({item.sku})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[11px] font-semibold text-gray-700">Order Quantity</label>
-                  <span className="text-[10px] text-gray-500">
-                    Live Available: <strong className="text-emerald-700 font-bold">{availableStock} Units</strong>
-                  </span>
-                </div>
-                <input
-                  type="number"
-                  min="1"
-                  required
-                  placeholder={`Max available: ${availableStock}`}
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                  className="w-full text-xs border border-surface-border rounded-lg p-2 bg-surface-muted focus:bg-white focus:border-brand-orange focus:outline-none"
-                />
-              </div>
-
-              {/* Concurrency guard informative note */}
-              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-[11px] text-blue-800 flex items-start gap-2">
-                <Lock className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>ACID Concurrency Protection:</strong> Reservation is executed with PostgreSQL row-level locking (<code>SELECT FOR UPDATE</code>) to guarantee zero overselling under simultaneous user load.
-                </span>
-              </div>
-
-              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-surface-border">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-3 py-2 border border-surface-border text-gray-600 rounded-lg text-xs hover:bg-gray-100 transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="px-4 py-2 bg-brand-orange hover:bg-brand-hover text-white rounded-lg text-xs font-medium shadow-md shadow-orange-500/20 transition disabled:opacity-50 cursor-pointer"
-                >
-                  {actionLoading ? 'Reserving...' : 'Confirm & Reserve Stock'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Create Order & Reserve Stock"
+        icon={ShoppingCart}
+      >
+        <form onSubmit={handleCreateOrder} className="space-y-3.5">
+          <div>
+            <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+              Order Number (Optional)
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. SO-1002 (Auto-generated if empty)"
+              value={formData.orderNumber}
+              onChange={(e) => setFormData({ ...formData, orderNumber: e.target.value })}
+              className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+            />
           </div>
-        </div>
-      )}
+
+          <div>
+            <label className="block text-[11px] font-semibold text-gray-700 mb-1">Customer Name</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Bharat Heavy Electricals"
+              value={formData.customerName}
+              onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+              className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-gray-700 mb-1">Fulfillment Location</label>
+            <select
+              value={formData.locationId}
+              onChange={(e) => setFormData({ ...formData, locationId: e.target.value })}
+              className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition cursor-pointer"
+            >
+              {locations.map((loc) => (
+                <option key={loc.id} value={loc.id}>
+                  {loc.name} ({loc.code})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-gray-700 mb-1">Item to Order</label>
+            <select
+              value={formData.itemId}
+              onChange={(e) => setFormData({ ...formData, itemId: e.target.value })}
+              className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition cursor-pointer"
+            >
+              {items.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name} ({item.sku})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[11px] font-semibold text-gray-700">Order Quantity</label>
+              <span className="text-[10px] text-gray-500 font-medium">
+                Live Available: <strong className="text-emerald-700 font-bold">{availableStock} Units</strong>
+              </span>
+            </div>
+            <input
+              type="number"
+              min="1"
+              required
+              placeholder={`Max available: ${availableStock}`}
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+              className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+            />
+          </div>
+
+          {/* Concurrency guard informative banner with ConcurrencyShieldSVG */}
+          <div className="p-3.5 bg-blue-50/80 rounded-xl border border-blue-200 text-[11px] text-blue-900 flex items-start gap-2.5">
+            <ConcurrencyShieldSVG className="w-5 h-5 shrink-0 mt-0.5" animated={true} />
+            <div>
+              <strong>ACID Concurrency Protection:</strong> Reservation is executed with PostgreSQL row-level locking (<code>SELECT FOR UPDATE</code>) to prevent race conditions & overselling.
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end space-x-2 pt-4 border-t border-surface-border">
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="px-3.5 py-2 border border-surface-border text-gray-600 rounded-xl text-xs hover:bg-gray-100 transition interactive-btn cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={actionLoading}
+              className="px-4 py-2 bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-500/20 transition interactive-btn disabled:opacity-50 cursor-pointer"
+            >
+              {actionLoading ? 'Reserving...' : 'Confirm & Reserve Stock'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

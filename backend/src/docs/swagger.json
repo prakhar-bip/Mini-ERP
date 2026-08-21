@@ -1,0 +1,225 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mini Operations ERP API",
+    "version": "1.0.0",
+    "description": "Production-grade Operations ERP API for Inventory, Work Orders, Stock Transfers, and Concurrency-Safe Reservations."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate user with email and password",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "admin@erp.com" },
+                  "password": { "type": "string", "example": "Password@123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful, returns JWT token" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get authenticated user profile and permissions",
+        "responses": {
+          "200": { "description": "User profile returned" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/inventory": {
+      "get": {
+        "summary": "List all inventory stock buckets with computed available quantity",
+        "responses": {
+          "200": { "description": "Inventory list returned" }
+        }
+      }
+    },
+    "/inventory/add": {
+      "post": {
+        "summary": "Inward / Add physical inventory stock (ADMIN or OPERATIONS_USER only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["itemId", "locationId", "batch", "physicalQty"],
+                "properties": {
+                  "itemId": { "type": "string" },
+                  "locationId": { "type": "string" },
+                  "batch": { "type": "string", "example": "BATCH-2026-X" },
+                  "physicalQty": { "type": "integer", "example": 50 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Stock added successfully" },
+          "403": { "description": "Forbidden for unauthorized roles" }
+        }
+      }
+    },
+    "/work-orders": {
+      "get": {
+        "summary": "Get all work orders with automated live shortage calculation",
+        "responses": {
+          "200": { "description": "Work orders list returned" }
+        }
+      },
+      "post": {
+        "summary": "Create new work order (ADMIN only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["locationId", "itemId", "requiredQty", "assignedUserId"],
+                "properties": {
+                  "orderNumber": { "type": "string", "example": "WO-1002" },
+                  "locationId": { "type": "string" },
+                  "itemId": { "type": "string" },
+                  "requiredQty": { "type": "integer", "example": 40 },
+                  "assignedUserId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Work order created" },
+          "403": { "description": "Forbidden for non-admin roles" }
+        }
+      }
+    },
+    "/transfers": {
+      "get": {
+        "summary": "List internal stock transfers",
+        "responses": {
+          "200": { "description": "Transfers list returned" }
+        }
+      },
+      "post": {
+        "summary": "Request internal stock transfer between locations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["sourceLocationId", "destLocationId", "itemId", "quantity"],
+                "properties": {
+                  "transferNumber": { "type": "string", "example": "TR-1002" },
+                  "sourceLocationId": { "type": "string" },
+                  "destLocationId": { "type": "string" },
+                  "itemId": { "type": "string" },
+                  "quantity": { "type": "integer", "example": 20 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Transfer requested" }
+        }
+      }
+    },
+    "/transfers/{id}/dispatch": {
+      "post": {
+        "summary": "Dispatch transfer (ACID transaction: reduces source physical stock, enters in-transit)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Transfer dispatched successfully" },
+          "400": { "description": "Cannot transfer more than available stock" }
+        }
+      }
+    },
+    "/transfers/{id}/receive": {
+      "post": {
+        "summary": "Receive transfer (ACID transaction: increases destination physical stock, prevents duplicate receipt)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Transfer received successfully" },
+          "400": { "description": "Transfer already received or not dispatched" }
+        }
+      }
+    },
+    "/customer-orders": {
+      "get": {
+        "summary": "List customer orders",
+        "responses": {
+          "200": { "description": "Customer orders returned" }
+        }
+      },
+      "post": {
+        "summary": "Create customer order and reserve stock (Concurrency-safe with SELECT FOR UPDATE)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["customerName", "locationId", "itemId", "quantity"],
+                "properties": {
+                  "orderNumber": { "type": "string", "example": "SO-1002" },
+                  "customerName": { "type": "string", "example": "Acme Industries" },
+                  "locationId": { "type": "string" },
+                  "itemId": { "type": "string" },
+                  "quantity": { "type": "integer", "example": 30 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Order confirmed and stock reserved" },
+          "400": { "description": "Cannot reserve more than available inventory" }
+        }
+      }
+    },
+    "/customer-orders/{id}/cancel": {
+      "post": {
+        "summary": "Cancel customer order and release reserved stock",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Order cancelled and stock released" }
+        }
+      }
+    }
+  }
+}

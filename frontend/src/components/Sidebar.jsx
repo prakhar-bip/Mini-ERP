@@ -1,24 +1,25 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Package, Wrench, ArrowLeftRight, ShoppingCart, LayoutDashboard } from 'lucide-react';
+import { Package, Wrench, ArrowLeftRight, ShoppingCart } from 'lucide-react';
 
 export default function Sidebar() {
   const navItems = [
-    { to: '/inventory', label: 'Inventory', icon: Package },
-    { to: '/work-orders', label: 'Work Orders', icon: Wrench },
-    { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight },
-    { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart },
+    { to: '/inventory', label: 'Inventory', icon: Package, badge: 'Stock' },
+    { to: '/work-orders', label: 'Work Orders', icon: Wrench, badge: 'Prod' },
+    { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, badge: 'Move' },
+    { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart, badge: 'Sales' },
   ];
 
   return (
-    <aside className="w-16 sm:w-56 bg-surface-card border-r border-surface-border flex flex-col justify-between shrink-0 select-none">
+    <aside className="w-16 sm:w-56 bg-white border-r border-gray-200 flex flex-col justify-between shrink-0 select-none shadow-xs">
       <div className="py-4">
-        <div className="px-4 mb-3 hidden sm:block">
-          <span className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
+        <div className="px-4 mb-2.5 hidden sm:flex items-center justify-between">
+          <span className="text-[10px] font-bold tracking-wider text-gray-400 uppercase">
             Operations
           </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
         </div>
-        <nav className="space-y-1 px-2">
+        <nav className="space-y-1 px-2.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -26,17 +27,33 @@ export default function Sidebar() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center px-3 py-2.5 rounded-lg text-xs font-medium transition-all group ${
+                  `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 group ${
                     isActive
-                      ? 'bg-brand-orange text-white shadow-sm shadow-orange-500/20'
+                      ? 'bg-navy-900 text-white shadow-xs'
                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className={`w-4 h-4 shrink-0 sm:mr-3 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}`} />
-                    <span className="hidden sm:inline-block">{item.label}</span>
+                    <div className="flex items-center">
+                      <Icon
+                        className={`w-4 h-4 shrink-0 sm:mr-2.5 transition-colors ${
+                          isActive ? 'text-brand-orange' : 'text-gray-400 group-hover:text-gray-700'
+                        }`}
+                      />
+                      <span className="hidden sm:inline-block font-semibold">{item.label}</span>
+                    </div>
+
+                    <span
+                      className={`hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded font-medium transition-colors ${
+                        isActive
+                          ? 'bg-navy-800 text-gray-300'
+                          : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
                   </>
                 )}
               </NavLink>
@@ -45,12 +62,12 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <div className="p-3 border-t border-surface-border text-center sm:text-left">
-        <div className="hidden sm:block text-[11px] text-gray-400 leading-tight">
-          Mini Operations ERP
-          <div className="text-[10px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-            PostgreSQL Connected
+      <div className="p-3.5 border-t border-gray-100 bg-gray-50/50">
+        <div className="hidden sm:block text-[11px] text-gray-500 leading-tight">
+          <div className="font-semibold text-gray-700">Enterprise Engine</div>
+          <div className="text-[10px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>PostgreSQL Synchronized</span>
           </div>
         </div>
       </div>
