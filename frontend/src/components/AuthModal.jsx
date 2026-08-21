@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Lock, Mail, ArrowRight, AlertCircle, RefreshCw, Shield, Sparkles } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle, RefreshCw, Sparkles, ShieldCheck } from 'lucide-react';
 import ERPLogoSVG from './svg/ERPLogoSVG.jsx';
 
 export default function AuthModal() {
@@ -46,7 +46,7 @@ export default function AuthModal() {
           </div>
           <div>
             <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
-              Mini Operations ERP
+              Mini ERP
               <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                 Secure
               </span>
@@ -111,6 +111,10 @@ export default function AuthModal() {
               </>
             )}
           </button>
+
+          <p className="text-[11px] text-gray-400 text-center font-medium pt-1">
+            * Account registration is managed by System Administrator
+          </p>
         </form>
 
         {/* 1-Click Role Quick Access */}

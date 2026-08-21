@@ -12,7 +12,7 @@ export default function Header() {
       case 'ADMIN':
         return (
           <span className="bg-red-500/15 text-red-300 border border-red-500/25 text-[10px] px-2 py-0.5 rounded-full font-medium tracking-wide">
-            Administrator
+            Admin
           </span>
         );
       case 'OPERATIONS_USER':
@@ -41,7 +41,7 @@ export default function Header() {
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-xs font-bold tracking-wider uppercase text-white">
-            Mini Operations ERP
+            Mini ERP
           </span>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function Header() {
           type="text"
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
-          placeholder="Search SKU, batch, orders..."
+          placeholder="Search..."
           className="bg-transparent border-none outline-none text-xs text-white placeholder-gray-400 w-full"
         />
       </div>

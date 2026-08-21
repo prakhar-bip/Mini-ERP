@@ -158,7 +158,7 @@ export default function InventoryScreen() {
         {/* Total Physical Card */}
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Physical Stock</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Stock</span>
             <div className="text-2xl font-black text-gray-900 mt-1">{totalPhysical.toLocaleString()}</div>
             <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
               <Box className="w-3 h-3" /> Across {locations.length} Locations
@@ -172,10 +172,10 @@ export default function InventoryScreen() {
         {/* Reserved Card */}
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Reserved (Locked)</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Reserved Stock</span>
             <div className="text-2xl font-black text-brand-orange mt-1">{totalReserved.toLocaleString()}</div>
             <span className="text-[10px] text-brand-orange font-semibold flex items-center gap-1 mt-1">
-              <ShieldCheck className="w-3 h-3" /> Active Order Locks
+              <ShieldCheck className="w-3 h-3" /> Reserved for Orders
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-brand-orange shadow-xs">
@@ -186,10 +186,10 @@ export default function InventoryScreen() {
         {/* Available Card */}
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Free Available Stock</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Available Stock</span>
             <div className="text-2xl font-black text-emerald-700 mt-1">{totalAvailable.toLocaleString()}</div>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-              <CheckCircle2 className="w-3 h-3" /> Ready for Fulfillment
+              <CheckCircle2 className="w-3 h-3" /> Ready for Use
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
@@ -212,110 +212,106 @@ export default function InventoryScreen() {
 
       {/* Main Split-Card Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Card: Inwarding Form */}
-        <div className="lg:col-span-4 bg-surface-card rounded-2xl border border-surface-border p-5 shadow-xs h-fit interactive-card">
-          <div className="flex items-center justify-between pb-3.5 border-b border-surface-border mb-4">
-            <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
-                <Package className="w-4 h-4" />
-              </div>
-              Stock Inwarding
-            </h2>
-            <span className="text-[10px] text-gray-400 font-mono bg-gray-100 px-2 py-0.5 rounded">Avail = Phys - Rsvd</span>
-          </div>
-
-          <form onSubmit={handleAddStock} className="space-y-3.5">
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-700 mb-1">Item / SKU</label>
-              <select
-                value={formData.itemId}
-                onChange={(e) => setFormData({ ...formData, itemId: e.target.value })}
-                className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
-              >
-                {items.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name} ({item.sku}) - {item.category}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-700 mb-1">Warehouse Location</label>
-              <select
-                value={formData.locationId}
-                onChange={(e) => setFormData({ ...formData, locationId: e.target.value })}
-                className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
-              >
-                {locations.map((loc) => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.name} ({loc.code})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-700 mb-1">Batch Identifier</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. BATCH-2026-X"
-                value={formData.batch}
-                onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
-                className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-700 mb-1">Physical Quantity (Units)</label>
-              <input
-                type="number"
-                min="1"
-                required
-                placeholder="e.g. 50"
-                value={formData.physicalQty}
-                onChange={(e) => setFormData({ ...formData, physicalQty: e.target.value })}
-                className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
-              />
-            </div>
-
-            <div className="pt-2">
-              <div className="text-[10px] text-gray-400 uppercase font-bold mb-1.5">Tracking Mode</div>
-              <div className="flex gap-1.5">
-                <span className="px-2.5 py-1 bg-navy-900 text-white rounded-lg text-[10px] font-semibold shadow-xs">Batch Stock</span>
-                <span className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-medium border border-gray-200">Serialized</span>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={actionLoading || !hasRole(['ADMIN', 'OPERATIONS_USER'])}
-              className="w-full mt-2 bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white py-2.5 px-4 rounded-xl font-bold text-xs shadow-md shadow-orange-500/20 flex items-center justify-center gap-1.5 interactive-btn cursor-pointer disabled:opacity-50"
-            >
-              {actionLoading ? (
-                <div className="flex items-center gap-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Updating Stock...</span>
+        {/* Left Card: Inwarding Form (Only visible to Admin & Operations Users) */}
+        {hasRole(['ADMIN', 'OPERATIONS_USER']) && (
+          <div className="lg:col-span-4 bg-surface-card rounded-2xl border border-surface-border p-5 shadow-xs h-fit interactive-card">
+            <div className="flex items-center justify-between pb-3.5 border-b border-surface-border mb-4">
+              <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
+                  <Package className="w-4 h-4" />
                 </div>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4" />
-                  <span>Inward Stock Bucket</span>
-                </>
-              )}
-            </button>
+                Add Stock
+              </h2>
+              <span className="text-[10px] text-gray-400 font-mono bg-gray-100 px-2 py-0.5 rounded">Available = Total - Reserved</span>
+            </div>
 
-            {!hasRole(['ADMIN', 'OPERATIONS_USER']) && (
-              <p className="text-[10px] text-amber-600 text-center font-medium">
-                * Admin or Operations User authorization required
-              </p>
-            )}
-          </form>
-        </div>
+            <form onSubmit={handleAddStock} className="space-y-3.5">
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Item / SKU</label>
+                <select
+                  value={formData.itemId}
+                  onChange={(e) => setFormData({ ...formData, itemId: e.target.value })}
+                  className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+                >
+                  {items.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} ({item.sku}) - {item.category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Warehouse Location</label>
+                <select
+                  value={formData.locationId}
+                  onChange={(e) => setFormData({ ...formData, locationId: e.target.value })}
+                  className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+                >
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name} ({loc.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Batch Identifier</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. BATCH-2026-X"
+                  value={formData.batch}
+                  onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                  className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-700 mb-1">Physical Quantity (Units)</label>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  placeholder="e.g. 50"
+                  value={formData.physicalQty}
+                  onChange={(e) => setFormData({ ...formData, physicalQty: e.target.value })}
+                  className="w-full text-xs border border-surface-border rounded-xl p-2.5 bg-surface-muted focus:bg-white focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 focus:outline-none transition"
+                />
+              </div>
+
+              <div className="pt-2">
+                <div className="text-[10px] text-gray-400 uppercase font-bold mb-1.5">Tracking Mode</div>
+                <div className="flex gap-1.5">
+                  <span className="px-2.5 py-1 bg-navy-900 text-white rounded-lg text-[10px] font-semibold shadow-xs">Batch Stock</span>
+                  <span className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-medium border border-gray-200">Serialized</span>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={actionLoading}
+                className="w-full mt-2 bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white py-2.5 px-4 rounded-xl font-bold text-xs shadow-md shadow-orange-500/20 flex items-center justify-center gap-1.5 interactive-btn cursor-pointer disabled:opacity-50"
+              >
+                {actionLoading ? (
+                  <div className="flex items-center gap-1.5">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Updating Stock...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" />
+                    <span>Inward Stock Bucket</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        )}
 
         {/* Right Card: Inventory Data Grid */}
-        <div className="lg:col-span-8 bg-surface-card rounded-2xl border border-surface-border p-5 shadow-xs">
+        <div className={`${hasRole(['ADMIN', 'OPERATIONS_USER']) ? 'lg:col-span-8' : 'lg:col-span-12'} bg-surface-card rounded-2xl border border-surface-border p-5 shadow-xs`}>
           {/* Header Controls & Tab Bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3.5 border-b border-surface-border gap-3">
             {/* Tabs */}

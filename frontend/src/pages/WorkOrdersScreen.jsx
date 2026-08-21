@@ -182,7 +182,7 @@ export default function WorkOrdersScreen() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Work Orders</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Orders</span>
             <div className="text-2xl font-black text-gray-900 mt-1">{workOrders.length}</div>
             <span className="text-[10px] text-gray-500 font-medium mt-1 block">Scheduled Batches</span>
           </div>
@@ -193,10 +193,10 @@ export default function WorkOrdersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">In Production</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">In Progress</span>
             <div className="text-2xl font-black text-amber-600 mt-1">{inProgressCount}</div>
             <span className="text-[10px] text-amber-600 font-semibold flex items-center gap-1 mt-1">
-              <Clock className="w-3 h-3 animate-spin" /> Live Line Assembly
+              <Clock className="w-3 h-3 animate-spin" /> Active
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-xs">
@@ -206,7 +206,7 @@ export default function WorkOrdersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Shortage Alerts</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Shortages</span>
             <div className={`text-2xl font-black mt-1 ${shortageCount > 0 ? 'text-red-600 animate-pulseSlow' : 'text-gray-700'}`}>
               {shortageCount}
             </div>
@@ -224,7 +224,7 @@ export default function WorkOrdersScreen() {
             <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Completed</span>
             <div className="text-2xl font-black text-emerald-700 mt-1">{completedCount}</div>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-              <CheckCircle2 className="w-3 h-3" /> Ready / In Stock
+              <CheckCircle2 className="w-3 h-3" /> Done
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
@@ -243,7 +243,7 @@ export default function WorkOrdersScreen() {
             Work Orders
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Production scheduling and material tracking
+            Manage production work orders
           </p>
         </div>
 
@@ -262,7 +262,7 @@ export default function WorkOrdersScreen() {
               className="bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-orange-500/20 flex items-center gap-1.5 interactive-btn cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              Create Work Order
+              New Order
             </button>
           ) : (
             <div className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 font-medium">

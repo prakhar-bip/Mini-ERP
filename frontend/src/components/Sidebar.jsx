@@ -22,13 +22,13 @@ export default function Sidebar() {
   const getRoleHeaderLabel = (role) => {
     switch (role) {
       case 'ADMIN':
-        return 'Admin Portal';
+        return 'Admin';
       case 'OPERATIONS_USER':
-        return 'Operations Portal';
-      case 'SALES_USER':
-        return 'Sales Portal';
-      default:
         return 'Operations';
+      case 'SALES_USER':
+        return 'Sales';
+      default:
+        return 'Menu';
     }
   };
 

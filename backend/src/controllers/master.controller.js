@@ -54,7 +54,7 @@ export class UserController {
 
   async createUser(req, res, next) {
     try {
-      const user = await userService.createUser(req.body);
+      const user = await userService.createUser(req.body, req.user);
       res.status(201).json({ success: true, message: 'Employee added successfully', data: user });
     } catch (err) {
       next(err);

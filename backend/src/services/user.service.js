@@ -19,7 +19,13 @@ export class UserService {
     });
   }
 
-  async createUser({ name, email, password, role, locationId }) {
+  async createUser({ name, email, password, role, locationId }, creatorUser) {
+    if (creatorUser?.role !== 'ADMIN') {
+      const error = new Error('Only Admin is authorized to create employee accounts.');
+      error.status = 403;
+      throw error;
+    }
+
     const existing = await prisma.user.findUnique({
       where: { email: email.toLowerCase() }
     });

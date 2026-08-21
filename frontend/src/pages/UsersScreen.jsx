@@ -71,7 +71,7 @@ export default function UsersScreen() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     if (!hasRole(['ADMIN'])) {
-      showNotification('error', 'Only Admin is authorized to add new employees.');
+      showNotification('error', 'Only Admin is authorized to add employee accounts.');
       return;
     }
 
@@ -188,7 +188,7 @@ export default function UsersScreen() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Staff</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Employees</span>
             <div className="text-2xl font-black text-gray-900 mt-1">{usersList.length}</div>
             <span className="text-[10px] text-gray-500 font-medium mt-1 block">Active Accounts</span>
           </div>
@@ -199,10 +199,10 @@ export default function UsersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Administrators</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Admins</span>
             <div className="text-2xl font-black text-red-600 mt-1">{adminCount}</div>
             <span className="text-[10px] text-red-600 font-semibold flex items-center gap-1 mt-1">
-              <Shield className="w-3 h-3" /> Full System Access
+              <Shield className="w-3 h-3" /> Full Access
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shadow-xs">
@@ -212,10 +212,10 @@ export default function UsersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Operations Team</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Operations</span>
             <div className="text-2xl font-black text-blue-600 mt-1">{opsCount}</div>
             <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
-              <UserCheck className="w-3 h-3" /> Inventory & Transfers
+              <UserCheck className="w-3 h-3" /> Operations Staff
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-xs">
@@ -225,10 +225,10 @@ export default function UsersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Sales Team</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Sales</span>
             <div className="text-2xl font-black text-emerald-700 mt-1">{salesCount}</div>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-              <Briefcase className="w-3 h-3" /> Customer Orders
+              <Briefcase className="w-3 h-3" /> Sales Staff
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
@@ -244,10 +244,10 @@ export default function UsersScreen() {
             <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
-            Employee Management
+            Employees
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Admin oversight: add, update, and manage Operations and Sales staff accounts
+            Manage staff accounts and permissions
           </p>
         </div>
 

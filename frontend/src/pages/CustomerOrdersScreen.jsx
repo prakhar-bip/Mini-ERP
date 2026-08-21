@@ -184,10 +184,10 @@ export default function CustomerOrdersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Confirmed & Locked</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Confirmed</span>
             <div className="text-2xl font-black text-emerald-700 mt-1">{confirmedCount}</div>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-              <CheckCircle2 className="w-3 h-3" /> Active Fulfillments
+              <CheckCircle2 className="w-3 h-3" /> Active Orders
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
@@ -200,7 +200,7 @@ export default function CustomerOrdersScreen() {
             <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Reserved Units</span>
             <div className="text-2xl font-black text-brand-orange mt-1">{totalReservedUnits.toLocaleString()}</div>
             <span className="text-[10px] text-brand-orange font-semibold flex items-center gap-1 mt-1">
-              <Box className="w-3 h-3" /> Protected in Buckets
+              <Box className="w-3 h-3" /> Reserved Stock
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-brand-orange shadow-xs">
@@ -210,17 +210,14 @@ export default function CustomerOrdersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Concurrency Engine</span>
-            <div className="text-xs font-black text-blue-900 mt-1 flex items-center gap-1.5">
-              <span>PostgreSQL Lock</span>
-              <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 text-[9px] font-mono">Row-Level</span>
-            </div>
-            <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
-              <CheckCircle2 className="w-3 h-3" /> 0% Oversell Guarantee
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cancelled Orders</span>
+            <div className="text-2xl font-black text-gray-500 mt-1">{cancelledCount}</div>
+            <span className="text-[10px] text-gray-500 font-medium flex items-center gap-1 mt-1">
+              <XCircle className="w-3 h-3" /> Released Stock
             </span>
           </div>
-          <div className="p-1 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shadow-xs">
-            <ConcurrencyShieldSVG className="w-8 h-8" animated={true} />
+          <div className="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 shadow-xs">
+            <XCircle className="w-5 h-5" />
           </div>
         </div>
       </div>
@@ -235,7 +232,7 @@ export default function CustomerOrdersScreen() {
             Customer Orders
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Sales order management and stock reservations
+            Manage customer sales orders
           </p>
         </div>
 
@@ -254,7 +251,7 @@ export default function CustomerOrdersScreen() {
               className="bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-orange-500/20 flex items-center gap-1.5 interactive-btn cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              New Customer Order
+              New Order
             </button>
           ) : (
             <div className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 font-medium">

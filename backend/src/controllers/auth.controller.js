@@ -15,6 +15,19 @@ export class AuthController {
     }
   }
 
+  async register(req, res, next) {
+    try {
+      const result = await authService.register(req.body);
+      return res.status(201).json({
+        success: true,
+        message: 'Account created successfully',
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getMe(req, res, next) {
     try {
       const user = await authService.getCurrentUser(req.user.id);

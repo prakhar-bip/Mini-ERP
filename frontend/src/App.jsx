@@ -64,7 +64,7 @@ function AppContent() {
           }
         />
 
-        {/* Employee Management restricted to ADMIN */}
+        {/* Employee Management restricted to ADMIN only */}
         <Route
           path="users"
           element={

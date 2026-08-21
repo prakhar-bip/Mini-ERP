@@ -39,6 +39,15 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  const register = async (formData) => {
+    const res = await authAPI.register(formData);
+    const { token: newToken, user: userData } = res.data.data;
+    localStorage.setItem('erp_token', newToken);
+    setToken(newToken);
+    setUser(userData);
+    return userData;
+  };
+
   const quickLogin = async (role) => {
     const credentials = {
       ADMIN: { email: 'admin@erp.com', password: 'Password@123' },
@@ -64,7 +73,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, quickLogin, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, quickLogin, logout, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

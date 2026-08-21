@@ -212,7 +212,7 @@ export default function TransfersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pending Dispatch</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pending</span>
             <div className="text-2xl font-black text-blue-600 mt-1">{requestedCount}</div>
             <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
               <Clock className="w-3 h-3" /> Ready at Source
@@ -225,10 +225,10 @@ export default function TransfersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">In-Transit Stock</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">In Transit</span>
             <div className="text-2xl font-black text-amber-600 mt-1">{dispatchedCount}</div>
             <span className="text-[10px] text-amber-600 font-semibold flex items-center gap-1 mt-1">
-              <Truck className="w-3 h-3 animate-pulseSlow" /> Between Hubs
+              <Truck className="w-3 h-3 animate-pulseSlow" /> Moving
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-xs">
@@ -238,10 +238,10 @@ export default function TransfersScreen() {
 
         <div className="bg-surface-card rounded-2xl border border-surface-border p-4 shadow-xs interactive-card flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Completed Deliveries</span>
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Completed</span>
             <div className="text-2xl font-black text-emerald-700 mt-1">{receivedCount}</div>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-              <CheckCircle2 className="w-3 h-3" /> Stock Inwarded
+              <CheckCircle2 className="w-3 h-3" /> Done
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
@@ -257,7 +257,7 @@ export default function TransfersScreen() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
               <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                Live Active Transit: <span className="font-mono text-brand-orange">{latestInTransit.transferNumber}</span>
+                Active Transit: <span className="font-mono text-brand-orange">{latestInTransit.transferNumber}</span>
               </h3>
             </div>
             <span className="text-[11px] font-semibold text-gray-500">
@@ -281,10 +281,10 @@ export default function TransfersScreen() {
             <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
               <ArrowLeftRight className="w-4 h-4" />
             </div>
-            Internal Stock Transfers
+            Transfers
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Inter-warehouse inventory movements and logistics
+            Transfer inventory between warehouses
           </p>
         </div>
 
@@ -303,7 +303,7 @@ export default function TransfersScreen() {
               className="bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-hover hover:to-orange-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-orange-500/20 flex items-center gap-1.5 interactive-btn cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              Request Transfer
+              New Transfer
             </button>
           )}
         </div>

@@ -13,17 +13,17 @@ export default function Layout() {
   const getBreadcrumbInfo = (path) => {
     switch (path) {
       case '/inventory':
-        return { label: 'Inventory & Stock Management', icon: Package, badge: 'Stock' };
+        return { label: 'Inventory', icon: Package };
       case '/work-orders':
-        return { label: 'Production & Work Orders', icon: Wrench, badge: 'Work Orders' };
+        return { label: 'Work Orders', icon: Wrench };
       case '/transfers':
-        return { label: 'Internal Stock Transfers', icon: ArrowLeftRight, badge: 'Transfers' };
+        return { label: 'Transfers', icon: ArrowLeftRight };
       case '/customer-orders':
-        return { label: 'Customer Orders & Reservation', icon: ShoppingCart, badge: 'Sales Orders' };
+        return { label: 'Customer Orders', icon: ShoppingCart };
       case '/users':
-        return { label: 'Employee & Staff Management', icon: Users, badge: 'Employees' };
+        return { label: 'Employees', icon: Users };
       default:
-        return { label: 'Operations Dashboard', icon: Sparkles, badge: 'Active' };
+        return { label: 'Dashboard', icon: Sparkles };
     }
   };
 
