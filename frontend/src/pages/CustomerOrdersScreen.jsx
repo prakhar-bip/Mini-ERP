@@ -232,10 +232,10 @@ export default function CustomerOrdersScreen() {
             <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
               <ShoppingCart className="w-4 h-4" />
             </div>
-            Customer Orders & Stock Reservation
+            Customer Orders
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Sales ordering with atomic row-level concurrency locking to prevent overselling
+            Sales order management and stock reservations
           </p>
         </div>
 

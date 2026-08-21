@@ -284,7 +284,7 @@ export default function TransfersScreen() {
             Internal Stock Transfers
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Inter-warehouse inventory movements with double-entry ACID consistency
+            Inter-warehouse inventory movements and logistics
           </p>
         </div>
 

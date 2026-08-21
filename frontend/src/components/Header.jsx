@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Search, LogOut, User, Shield } from 'lucide-react';
+import { Search, LogOut, User } from 'lucide-react';
 import ERPLogoSVG from './svg/ERPLogoSVG.jsx';
 
 export default function Header() {
@@ -43,14 +43,10 @@ export default function Header() {
           <span className="text-xs font-bold tracking-wider uppercase text-white">
             Mini Operations ERP
           </span>
-          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Enterprise
-          </span>
         </div>
       </div>
 
-      {/* Global Quick Search */}
+      {/* Global Search without shortcut UI */}
       <div className={`hidden md:flex items-center bg-navy-800/80 border rounded-xl px-3.5 py-1.5 text-xs text-gray-300 transition-all duration-200 ${
         searchFocused ? 'w-80 border-brand-orange ring-2 ring-brand-orange/20' : 'w-64 border-navy-700/70'
       }`}>
@@ -62,19 +58,16 @@ export default function Header() {
           placeholder="Search SKU, batch, orders..."
           className="bg-transparent border-none outline-none text-xs text-white placeholder-gray-400 w-full"
         />
-        <kbd className="hidden sm:inline-block text-[9px] bg-navy-700 text-gray-300 px-1.5 py-0.5 rounded border border-navy-600 font-mono">
-          ⌘K
-        </kbd>
       </div>
 
       {/* Right User Profile & Actions */}
       <div className="flex items-center space-x-3">
         {user ? (
           <div className="flex items-center space-x-3">
-            {/* User Profile Tag */}
+            {/* User Profile Tag without letter avatar */}
             <div className="flex items-center space-x-2.5 bg-navy-800/70 px-3 py-1.5 rounded-xl border border-navy-700/80 shadow-xs">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-brand-orange to-amber-500 text-white font-bold text-[11px] flex items-center justify-center shadow-xs">
-                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              <div className="w-7 h-7 rounded-lg bg-navy-700 text-gray-300 flex items-center justify-center border border-navy-600">
+                <User className="w-4 h-4" />
               </div>
               <div className="flex flex-col text-left">
                 <span className="text-xs font-semibold text-gray-100 leading-tight">

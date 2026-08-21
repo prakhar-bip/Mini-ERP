@@ -7,10 +7,10 @@ export default function Sidebar() {
   const { user } = useAuth();
 
   const allNavItems = [
-    { to: '/inventory', label: 'Inventory', icon: Package, badge: 'Stock', roles: ['ADMIN', 'OPERATIONS_USER', 'SALES_USER'] },
-    { to: '/work-orders', label: 'Work Orders', icon: Wrench, badge: 'Prod', roles: ['ADMIN', 'OPERATIONS_USER'] },
-    { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, badge: 'Move', roles: ['ADMIN', 'OPERATIONS_USER'] },
-    { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart, badge: 'Sales', roles: ['ADMIN', 'SALES_USER'] },
+    { to: '/inventory', label: 'Inventory', icon: Package, roles: ['ADMIN', 'OPERATIONS_USER', 'SALES_USER'] },
+    { to: '/work-orders', label: 'Work Orders', icon: Wrench, roles: ['ADMIN', 'OPERATIONS_USER'] },
+    { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, roles: ['ADMIN', 'OPERATIONS_USER'] },
+    { to: '/customer-orders', label: 'Customer Orders', icon: ShoppingCart, roles: ['ADMIN', 'SALES_USER'] },
   ];
 
   // Dynamically filter navigation links based on user's authorized role
@@ -48,7 +48,7 @@ export default function Sidebar() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 group ${
+                  `flex items-center px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 group ${
                     isActive
                       ? 'bg-navy-900 text-white shadow-xs'
                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
@@ -56,26 +56,14 @@ export default function Sidebar() {
                 }
               >
                 {({ isActive }) => (
-                  <>
-                    <div className="flex items-center">
-                      <Icon
-                        className={`w-4 h-4 shrink-0 sm:mr-2.5 transition-colors ${
-                          isActive ? 'text-brand-orange' : 'text-gray-400 group-hover:text-gray-700'
-                        }`}
-                      />
-                      <span className="hidden sm:inline-block font-semibold">{item.label}</span>
-                    </div>
-
-                    <span
-                      className={`hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded font-medium transition-colors ${
-                        isActive
-                          ? 'bg-navy-800 text-gray-300'
-                          : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600'
+                  <div className="flex items-center">
+                    <Icon
+                      className={`w-4 h-4 shrink-0 sm:mr-2.5 transition-colors ${
+                        isActive ? 'text-brand-orange' : 'text-gray-400 group-hover:text-gray-700'
                       }`}
-                    >
-                      {item.badge}
-                    </span>
-                  </>
+                    />
+                    <span className="hidden sm:inline-block font-semibold">{item.label}</span>
+                  </div>
                 )}
               </NavLink>
             );
@@ -85,10 +73,10 @@ export default function Sidebar() {
 
       <div className="p-3.5 border-t border-gray-100 bg-gray-50/50">
         <div className="hidden sm:block text-[11px] text-gray-500 leading-tight">
-          <div className="font-semibold text-gray-700">Enterprise Engine</div>
+          <div className="font-semibold text-gray-700">Mini ERP</div>
           <div className="text-[10px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span>PostgreSQL Synchronized</span>
+            <span>Online</span>
           </div>
         </div>
       </div>

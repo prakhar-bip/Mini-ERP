@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { workOrderAPI, masterAPI } from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Wrench, Plus, CheckCircle2, AlertTriangle, RefreshCw, UserCheck, Play, Check, Clock, AlertCircle } from 'lucide-react';
+import { Wrench, Plus, CheckCircle2, AlertTriangle, RefreshCw, UserCheck, Play, Check, Clock, AlertCircle, ArrowRight, Truck } from 'lucide-react';
 import Modal from '../components/common/Modal.jsx';
 import Toast from '../components/common/Toast.jsx';
 import SkeletonLoader from '../components/common/SkeletonLoader.jsx';
@@ -239,10 +240,10 @@ export default function WorkOrdersScreen() {
             <div className="w-7 h-7 rounded-lg bg-orange-50 text-brand-orange border border-orange-200 flex items-center justify-center">
               <Wrench className="w-4 h-4" />
             </div>
-            Work Orders & Material Stock Check
+            Work Orders
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Admin production scheduling with automated location stock shortage detection
+            Production scheduling and material tracking
           </p>
         </div>
 
@@ -332,14 +333,26 @@ export default function WorkOrdersScreen() {
                       {/* Shortage Calculation Cell with Visual Tag */}
                       <td className="py-3 px-3">
                         {wo.hasShortage ? (
-                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-[11px] font-semibold animate-pulseSlow">
-                            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
-                            <div>
-                              <div>Shortage: {wo.shortage} {wo.item.unit}</div>
-                              <span className="text-[10px] text-red-700 font-normal block">
-                                (Available at {wo.location.code}: {wo.availableAtLocation})
-                              </span>
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-[11px] font-semibold">
+                              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 animate-bounce" />
+                              <div>
+                                <div>Shortage: <strong className="text-red-900">{wo.shortage} {wo.item.unit}</strong></div>
+                                <span className="text-[10px] text-red-700 font-normal block">
+                                  (At {wo.location.code}: {wo.availableAtLocation} / {wo.requiredQty})
+                                </span>
+                              </div>
                             </div>
+                            {hasRole(['ADMIN', 'OPERATIONS_USER']) && (
+                              <Link
+                                to="/transfers"
+                                title="Resolve shortage via internal transfer"
+                                className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 shadow-xs transition interactive-btn whitespace-nowrap"
+                              >
+                                <Truck className="w-3 h-3" />
+                                <span>Transfer Material →</span>
+                              </Link>
+                            )}
                           </div>
                         ) : (
                           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold">

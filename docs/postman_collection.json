@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Mini Operations ERP API Collection",
-    "description": "Postman Collection for Mini Operations ERP covering Auth, Master Data, Inventory, Work Orders, Transfers, and Customer Orders",
+    "description": "Comprehensive Postman API Collection for Mini Operations ERP covering Auth, Inventory, Work Orders with Shortage Calculation, Multi-State Transfers, and Concurrency-Safe Order Reservations.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -13,7 +13,24 @@
       "name": "1. Authentication",
       "item": [
         {
-          "name": "Login - Admin",
+          "name": "Login - Admin (Auto Sets Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.data && json.data.token) {",
+                  "        pm.collectionVariables.set('token', json.data.token);",
+                  "        console.log('Token set successfully for Admin');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/auth/login",
@@ -25,7 +42,23 @@
           }
         },
         {
-          "name": "Login - Operations",
+          "name": "Login - Operations (Auto Sets Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.data && json.data.token) {",
+                  "        pm.collectionVariables.set('token', json.data.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/auth/login",
@@ -37,7 +70,23 @@
           }
         },
         {
-          "name": "Login - Sales",
+          "name": "Login - Sales (Auto Sets Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.data && json.data.token) {",
+                  "        pm.collectionVariables.set('token', json.data.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/auth/login",
@@ -49,7 +98,7 @@
           }
         },
         {
-          "name": "Get Current Session",
+          "name": "Get Current User Profile (/me)",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
@@ -59,10 +108,39 @@
       ]
     },
     {
-      "name": "2. Inventory Management",
+      "name": "2. Master Data",
       "item": [
         {
-          "name": "Get All Inventories",
+          "name": "Get All Warehouses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/master/locations"
+          }
+        },
+        {
+          "name": "Get All Items Catalog",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/master/items"
+          }
+        },
+        {
+          "name": "Get Assignable Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/master/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Inventory Management",
+      "item": [
+        {
+          "name": "Get Inventory Batches",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
@@ -70,14 +148,22 @@
           }
         },
         {
-          "name": "Inward / Add Stock",
+          "name": "Get Inventory Summary by Location",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/inventory/summary"
+          }
+        },
+        {
+          "name": "Inward / Add Stock (Admin & Ops)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/inventory/add",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"itemId\": \"item-id-here\",\n  \"locationId\": \"location-id-here\",\n  \"batch\": \"BATCH-2026-X\",\n  \"physicalQty\": 50\n}",
+              "raw": "{\n  \"itemId\": \"ITEM_ID_HERE\",\n  \"locationId\": \"LOCATION_ID_HERE\",\n  \"batch\": \"BATCH-2026-X\",\n  \"physicalQty\": 50\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
@@ -85,10 +171,10 @@
       ]
     },
     {
-      "name": "3. Work Orders",
+      "name": "4. Work Orders (with Shortage Logic)",
       "item": [
         {
-          "name": "Get Work Orders (with auto shortage check)",
+          "name": "Get Work Orders (Auto calculates shortage)",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
@@ -96,14 +182,27 @@
           }
         },
         {
-          "name": "Create Work Order (Admin)",
+          "name": "Create Work Order (Admin Only)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/work-orders",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderNumber\": \"WO-1002\",\n  \"locationId\": \"location-id\",\n  \"itemId\": \"item-id\",\n  \"requiredQty\": 40,\n  \"assignedUserId\": \"user-id\"\n}",
+              "raw": "{\n  \"orderNumber\": \"WO-1002\",\n  \"locationId\": \"LOCATION_ID_HERE\",\n  \"itemId\": \"ITEM_ID_HERE\",\n  \"requiredQty\": 60,\n  \"assignedUserId\": \"USER_ID_HERE\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Advance Status to IN_PROGRESS",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/work-orders/WORK_ORDER_ID/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
@@ -111,10 +210,10 @@
       ]
     },
     {
-      "name": "4. Internal Stock Transfers",
+      "name": "5. Internal Stock Transfers",
       "item": [
         {
-          "name": "Get Transfers",
+          "name": "Get Transfers List",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
@@ -122,38 +221,38 @@
           }
         },
         {
-          "name": "Request Transfer",
+          "name": "Request Internal Transfer",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/transfers",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transferNumber\": \"TR-1002\",\n  \"sourceLocationId\": \"source-id\",\n  \"destLocationId\": \"dest-id\",\n  \"itemId\": \"item-id\",\n  \"quantity\": 20\n}",
+              "raw": "{\n  \"transferNumber\": \"TR-1002\",\n  \"sourceLocationId\": \"SOURCE_LOC_ID\",\n  \"destLocationId\": \"DEST_LOC_ID\",\n  \"itemId\": \"ITEM_ID\",\n  \"quantity\": 30\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
         },
         {
-          "name": "Dispatch Transfer",
+          "name": "Dispatch Transfer (Reduces Source Stock)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/transfers/transfer-id-here/dispatch"
+            "url": "{{baseUrl}}/transfers/TRANSFER_ID/dispatch"
           }
         },
         {
-          "name": "Receive Transfer",
+          "name": "Receive Transfer (Increases Dest Stock)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/transfers/transfer-id-here/receive"
+            "url": "{{baseUrl}}/transfers/TRANSFER_ID/receive"
           }
         }
       ]
     },
     {
-      "name": "5. Customer Orders & Concurrency",
+      "name": "6. Customer Orders & Concurrency",
       "item": [
         {
           "name": "Get Customer Orders",
@@ -164,16 +263,24 @@
           }
         },
         {
-          "name": "Create Order & Reserve Stock",
+          "name": "Create Order & Reserve (Locking Protected)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/customer-orders",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderNumber\": \"SO-1002\",\n  \"customerName\": \"Bharat Heavy Electricals\",\n  \"locationId\": \"location-id\",\n  \"itemId\": \"item-id\",\n  \"quantity\": 30\n}",
+              "raw": "{\n  \"orderNumber\": \"SO-1002\",\n  \"customerName\": \"Bharat Heavy Electricals Ltd\",\n  \"locationId\": \"LOCATION_ID\",\n  \"itemId\": \"ITEM_ID\",\n  \"quantity\": 25\n}",
               "options": { "raw": { "language": "json" } }
             }
+          }
+        },
+        {
+          "name": "Cancel Order (Releases Reserved Stock)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/customer-orders/ORDER_ID/cancel"
           }
         }
       ]
