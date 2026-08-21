@@ -1,0 +1,33 @@
+{
+  "name": "mini-operations-erp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade Mini Operations ERP system with multi-location inventory, work orders, transfers, and concurrency-safe reservations",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspace=backend"
+  },
+  "keywords": [
+    "erp",
+    "inventory",
+    "operations",
+    "typescript",
+    "postgresql",
+    "prisma"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0"
+  },
+  "devDependencies": {
+    "caniuse-lite": "^1.0.30001809"
+  }
+}

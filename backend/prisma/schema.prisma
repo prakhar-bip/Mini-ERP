@@ -1,0 +1,158 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  OPERATIONS_USER
+  SALES_USER
+}
+
+enum WorkOrderStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum TransferStatus {
+  REQUESTED
+  DISPATCHED
+  RECEIVED
+}
+
+enum CustomerOrderStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id         String    @id @default(cuid())
+  name       String
+  email      String    @unique
+  password   String
+  role       Role
+  locationId String?
+  location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  workOrders WorkOrder[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@map("users")
+}
+
+model Location {
+  id      String  @id @default(cuid())
+  name    String
+  code    String  @unique
+  address String?
+
+  users           User[]
+  inventories     Inventory[]
+  workOrders      WorkOrder[]
+  sourceTransfers InternalTransfer[] @relation("SourceLocation")
+  destTransfers   InternalTransfer[] @relation("DestLocation")
+  customerOrders  CustomerOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("locations")
+}
+
+model Item {
+  id       String @id @default(cuid())
+  name     String
+  sku      String @unique
+  category String
+  unit     String @default("PCS")
+
+  inventories    Inventory[]
+  workOrders     WorkOrder[]
+  transfers      InternalTransfer[]
+  customerOrders CustomerOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("items")
+}
+
+model Inventory {
+  id          String   @id @default(cuid())
+  itemId      String
+  item        Item     @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  batch       String
+  physicalQty Int      @default(0)
+  reservedQty Int      @default(0)
+  version     Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([itemId, locationId, batch])
+  @@index([locationId, itemId])
+  @@map("inventories")
+}
+
+model WorkOrder {
+  id             String          @id @default(cuid())
+  orderNumber    String          @unique
+  locationId     String
+  location       Location        @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  itemId         String
+  item           Item            @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  requiredQty    Int
+  assignedUserId String
+  assignedUser   User            @relation(fields: [assignedUserId], references: [id], onDelete: Restrict)
+  status         WorkOrderStatus @default(ASSIGNED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("work_orders")
+}
+
+model InternalTransfer {
+  id               String         @id @default(cuid())
+  transferNumber   String         @unique
+  sourceLocationId String
+  sourceLocation   Location       @relation("SourceLocation", fields: [sourceLocationId], references: [id], onDelete: Restrict)
+  destLocationId   String
+  destLocation     Location       @relation("DestLocation", fields: [destLocationId], references: [id], onDelete: Restrict)
+  itemId           String
+  item             Item           @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  quantity         Int
+  status           TransferStatus @default(REQUESTED)
+  dispatchedAt     DateTime?
+  receivedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("internal_transfers")
+}
+
+model CustomerOrder {
+  id           String              @id @default(cuid())
+  orderNumber  String              @unique
+  customerName String
+  locationId   String
+  location     Location            @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  itemId       String
+  item         Item                @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  quantity     Int
+  status       CustomerOrderStatus @default(CONFIRMED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("customer_orders")
+}
