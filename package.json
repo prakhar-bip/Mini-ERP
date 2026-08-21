@@ -8,9 +8,11 @@
     "frontend"
   ],
   "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run dev --workspace=backend",
     "dev:frontend": "npm run dev --workspace=frontend",
     "build": "npm run build --workspaces",
+    "seed": "npm run seed --workspace=backend",
     "test": "npm run test --workspace=backend"
   },
   "keywords": [
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@babel/types": "^8.0.4",
-    "caniuse-lite": "^1.0.30001809"
+    "caniuse-lite": "^1.0.30001809",
+    "concurrently": "^10.0.5"
   }
 }
