@@ -28,6 +28,7 @@
     "prisma": "^5.22.0"
   },
   "devDependencies": {
+    "@babel/types": "^8.0.4",
     "caniuse-lite": "^1.0.30001809"
   }
 }
