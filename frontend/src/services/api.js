@@ -44,7 +44,9 @@ export const inventoryAPI = {
   getInventories: (params) => api.get('/inventory', { params }),
   getSummary: (params) => api.get('/inventory/summary', { params }),
   addStock: (data) => api.post('/inventory/add', data),
-  adjustStock: (data) => api.post('/inventory/adjust', data)
+  adjustStock: (data) => api.post('/inventory/adjust', data),
+  updateInventory: (id, data) => api.put(`/inventory/${id}`, data),
+  deleteInventory: (id) => api.delete(`/inventory/${id}`)
 };
 
 export const workOrderAPI = {

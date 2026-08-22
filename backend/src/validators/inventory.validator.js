@@ -17,3 +17,12 @@ export const adjustStockSchema = z.object({
     })
   })
 });
+
+export const updateInventorySchema = z.object({
+  body: z.object({
+    physicalQty: z.number().int().min(0).optional(),
+    reservedQty: z.number().int().min(0).optional(),
+    batch: z.string().min(1).optional(),
+    locationId: z.string().min(1).optional()
+  })
+});

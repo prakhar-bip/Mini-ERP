@@ -3,7 +3,7 @@ import { inventoryController } from '../controllers/inventory.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { authorize } from '../middlewares/rbac.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
-import { addInventorySchema, adjustStockSchema } from '../validators/inventory.validator.js';
+import { addInventorySchema, adjustStockSchema, updateInventorySchema } from '../validators/inventory.validator.js';
 
 const router = Router();
 
@@ -26,6 +26,19 @@ router.post(
   authorize(['ADMIN', 'OPERATIONS_USER']),
   validate(adjustStockSchema),
   (req, res, next) => inventoryController.adjustStock(req, res, next)
+);
+
+router.put(
+  '/:id',
+  authorize(['ADMIN', 'OPERATIONS_USER']),
+  validate(updateInventorySchema),
+  (req, res, next) => inventoryController.updateInventory(req, res, next)
+);
+
+router.delete(
+  '/:id',
+  authorize(['ADMIN', 'OPERATIONS_USER']),
+  (req, res, next) => inventoryController.deleteInventory(req, res, next)
 );
 
 export default router;

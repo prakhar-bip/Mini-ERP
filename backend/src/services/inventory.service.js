@@ -166,6 +166,81 @@ export class InventoryService {
       };
     });
   }
+
+  async updateInventory(id, { physicalQty, reservedQty, batch, locationId }) {
+    const existing = await prisma.inventory.findUnique({
+      where: { id },
+      include: { item: true, location: true }
+    });
+
+    if (!existing) {
+      const error = new Error('Inventory batch record not found.');
+      error.status = 404;
+      throw error;
+    }
+
+    const newPhysical = physicalQty !== undefined ? Number(physicalQty) : existing.physicalQty;
+    const newReserved = reservedQty !== undefined ? Number(reservedQty) : existing.reservedQty;
+
+    if (newPhysical < 0) {
+      const error = new Error('Physical quantity cannot be negative.');
+      error.status = 400;
+      throw error;
+    }
+
+    if (newReserved < 0) {
+      const error = new Error('Reserved quantity cannot be negative.');
+      error.status = 400;
+      throw error;
+    }
+
+    if (newPhysical < newReserved) {
+      const error = new Error(
+        `Invalid inventory adjustment: Physical quantity (${newPhysical}) cannot be less than reserved quantity (${newReserved}).`
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    const updateData = {
+      physicalQty: newPhysical,
+      reservedQty: newReserved,
+      version: { increment: 1 }
+    };
+    if (batch) updateData.batch = batch.trim();
+    if (locationId) updateData.locationId = locationId;
+
+    const updated = await prisma.inventory.update({
+      where: { id },
+      data: updateData,
+      include: { item: true, location: true }
+    });
+
+    return {
+      ...updated,
+      availableQty: Math.max(0, updated.physicalQty - updated.reservedQty)
+    };
+  }
+
+  async deleteInventory(id) {
+    const existing = await prisma.inventory.findUnique({ where: { id } });
+    if (!existing) {
+      const error = new Error('Inventory batch record not found.');
+      error.status = 404;
+      throw error;
+    }
+
+    if (existing.reservedQty > 0) {
+      const error = new Error(
+        `Cannot delete inventory batch '${existing.batch}'. It has ${existing.reservedQty} active reserved stock units.`
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    await prisma.inventory.delete({ where: { id } });
+    return { success: true, message: `Inventory batch '${existing.batch}' deleted successfully.` };
+  }
 }
 
 export const inventoryService = new InventoryService();

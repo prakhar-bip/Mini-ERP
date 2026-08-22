@@ -27,7 +27,7 @@ export default function TransfersScreen() {
     quantity: ''
   });
 
-  const fetchData = async () => {
+  const fetchData = async (showSkeleton = false) => {
     if (!user) {
       setTransfers([
         {
@@ -46,24 +46,19 @@ export default function TransfersScreen() {
           status: 'REQUESTED',
           quantity: 20,
           createdAt: new Date().toISOString(),
-          sourceLocation: { name: 'Assembly Plant 1', code: 'WH-WEST' },
-          destLocation: { name: 'Main Warehouse', code: 'WH-MAIN' },
+          sourceLocation: { name: 'Main Hub', code: 'WH-MAIN' },
+          destLocation: { name: 'Regional Hub', code: 'WH-WEST' },
           item: { name: 'Aluminium Battery Enclosure', sku: 'RAW-ALUM-02', unit: 'pcs' }
         }
       ]);
-      setLocations([
-        { id: 'loc-1', name: 'Main Warehouse', code: 'WH-MAIN' },
-        { id: 'loc-2', name: 'Regional Hub East', code: 'WH-EAST' }
-      ]);
-      setItems([
-        { id: 'item-1', name: 'Lithium Iron Phosphate Cell', sku: 'RAW-LITH-01' }
-      ]);
+      setLocations([{ id: 'loc-1', name: 'Main Hub', code: 'WH-MAIN' }]);
+      setItems([{ id: 'item-1', name: 'Lithium Cell', sku: 'RAW-LITH-01' }]);
       setLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
+      if (showSkeleton) setLoading(true);
       const [trRes, locRes, itemRes] = await Promise.all([
         transferAPI.getTransfers(activeTab !== 'ALL' ? { status: activeTab } : undefined),
         masterAPI.getLocations(),
@@ -93,7 +88,7 @@ export default function TransfersScreen() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [user, activeTab]);
 
   const showNotification = (type, message) => {
@@ -131,7 +126,7 @@ export default function TransfersScreen() {
       showNotification('success', `Transfer ${res.data.data.transferNumber} created successfully!`);
       setShowModal(false);
       setFormData((prev) => ({ ...prev, transferNumber: '', quantity: '' }));
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -144,7 +139,7 @@ export default function TransfersScreen() {
       setActionLoading(true);
       const res = await transferAPI.dispatchTransfer(id);
       showNotification('success', res.data.message || 'Transfer dispatched! Source inventory reduced.');
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -157,7 +152,7 @@ export default function TransfersScreen() {
       setActionLoading(true);
       const res = await transferAPI.receiveTransfer(id);
       showNotification('success', res.data.message || 'Transfer received! Destination inventory increased.');
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {

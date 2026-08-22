@@ -28,7 +28,7 @@ export default function UsersScreen() {
     locationId: ''
   });
 
-  const fetchData = async () => {
+  const fetchData = async (showSkeleton = false) => {
     if (!user) {
       setUsersList([
         { id: 'usr-1', name: 'Prakhar Admin', email: 'admin@erp.com', role: 'ADMIN', location: { name: 'Main Assembly Unit', code: 'WH-MAIN' }, createdAt: new Date().toISOString() },
@@ -41,7 +41,7 @@ export default function UsersScreen() {
     }
 
     try {
-      setLoading(true);
+      if (showSkeleton) setLoading(true);
       const [uRes, lRes] = await Promise.all([
         masterAPI.getUsers(),
         masterAPI.getLocations()
@@ -60,7 +60,7 @@ export default function UsersScreen() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [user]);
 
   const showNotification = (type, message) => {
@@ -87,7 +87,7 @@ export default function UsersScreen() {
       showNotification('success', `Employee '${res.data.data.name}' added successfully!`);
       setShowAddModal(false);
       setFormData({ name: '', email: '', password: '', role: 'OPERATIONS_USER', locationId: locations[0]?.id || '' });
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -123,7 +123,7 @@ export default function UsersScreen() {
       showNotification('success', `Employee '${res.data.data.name}' updated successfully!`);
       setShowEditModal(false);
       setEditingUser(null);
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -144,8 +144,8 @@ export default function UsersScreen() {
     try {
       setActionLoading(true);
       const res = await masterAPI.deleteUser(targetUser.id);
-      showNotification('success', res.data.message || `Employee '${targetUser.name}' deleted successfully.`);
-      await fetchData();
+      showNotification('success', res.data.message || 'Employee removed successfully.');
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {

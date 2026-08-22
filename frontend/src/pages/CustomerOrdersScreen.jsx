@@ -27,7 +27,7 @@ export default function CustomerOrdersScreen() {
     quantity: ''
   });
 
-  const fetchData = async () => {
+  const fetchData = async (showSkeleton = false) => {
     if (!user) {
       setOrders([
         {
@@ -62,7 +62,7 @@ export default function CustomerOrdersScreen() {
     }
 
     try {
-      setLoading(true);
+      if (showSkeleton) setLoading(true);
       const [orderRes, locRes, itemRes, invRes] = await Promise.all([
         customerOrderAPI.getCustomerOrders(),
         masterAPI.getLocations(),
@@ -88,7 +88,7 @@ export default function CustomerOrdersScreen() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [user]);
 
   const showNotification = (type, message) => {
@@ -133,7 +133,7 @@ export default function CustomerOrdersScreen() {
       );
       setShowModal(false);
       setFormData((prev) => ({ ...prev, orderNumber: '', customerName: '', quantity: '' }));
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -149,7 +149,7 @@ export default function CustomerOrdersScreen() {
       setActionLoading(true);
       const res = await customerOrderAPI.cancelCustomerOrder(id);
       showNotification('success', res.data.message || 'Order cancelled and reserved stock released.');
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {

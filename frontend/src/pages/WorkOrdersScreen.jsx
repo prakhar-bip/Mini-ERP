@@ -27,7 +27,7 @@ export default function WorkOrdersScreen() {
     assignedUserId: ''
   });
 
-  const fetchData = async () => {
+  const fetchData = async (showSkeleton = false) => {
     if (!user) {
       setWorkOrders([
         {
@@ -64,7 +64,7 @@ export default function WorkOrdersScreen() {
     }
 
     try {
-      setLoading(true);
+      if (showSkeleton) setLoading(true);
       const [woRes, locRes, itemRes, userRes] = await Promise.all([
         workOrderAPI.getWorkOrders(),
         masterAPI.getLocations(),
@@ -93,7 +93,7 @@ export default function WorkOrdersScreen() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [user]);
 
   const showNotification = (type, message) => {
@@ -126,7 +126,7 @@ export default function WorkOrdersScreen() {
       showNotification('success', `Work Order ${res.data.data.orderNumber} created successfully!`);
       setShowModal(false);
       setFormData((prev) => ({ ...prev, orderNumber: '', requiredQty: '' }));
-      await fetchData();
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -138,8 +138,8 @@ export default function WorkOrdersScreen() {
     try {
       setActionLoading(true);
       await workOrderAPI.updateStatus(id, nextStatus);
-      showNotification('success', `Work Order status updated to '${nextStatus}'`);
-      await fetchData();
+      showNotification('success', `Work Order status updated to ${nextStatus}!`);
+      await fetchData(false);
     } catch (err) {
       showNotification('error', err.message);
     } finally {

@@ -46,6 +46,28 @@ export class InventoryController {
       next(err);
     }
   }
+
+  async updateInventory(req, res, next) {
+    try {
+      const result = await inventoryService.updateInventory(req.params.id, req.body);
+      res.status(200).json({
+        success: true,
+        message: 'Inventory batch updated successfully',
+        data: result
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteInventory(req, res, next) {
+    try {
+      const result = await inventoryService.deleteInventory(req.params.id);
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const inventoryController = new InventoryController();
