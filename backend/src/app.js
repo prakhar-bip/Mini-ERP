@@ -4,7 +4,6 @@ import swaggerUi from 'swagger-ui-express';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { env } from './config/env.js';
 import apiRoutes from './routes/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,9 +14,10 @@ const swaggerDocument = JSON.parse(
 
 const app = express();
 
+// Enable dynamic CORS for all frontend origins (Vercel, localhost, custom domains)
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: true,
     credentials: true
   })
 );
@@ -38,6 +38,14 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Mount modular API routes
 app.use('/api', apiRoutes);
+
+// 404 handler for unknown API routes
+app.use('*', (_req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found'
+  });
+});
 
 // Centralized error handling middleware
 app.use((err, _req, res, _next) => {
